@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Te Amo Mi Niña Hermosa</title>
+
+<!-- Fuentes -->
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    background:radial-gradient(circle at bottom,#020824,#000);
+    position:relative;
+    color:white;
+}
+
+/* Fondo estrellas */
+canvas{
+    position:absolute;
+    top:0;
+    left:0;
+    z-index:0;
+}
+
+/* MENSAJE INICIAL */
+.mensaje{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-family:'Great Vibes', cursive;
+    font-size:90px;
+    text-align:center;
+    z-index:4;
+    text-shadow:
+        0 0 10px white,
+        0 0 25px rgba(255,255,255,.6),
+        0 0 40px rgba(255,255,255,.4);
+}
+
+/* BOTÓN CORAZÓN */
+#btnInicio{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-family:'Playfair Display', serif;
+    font-size:42px;
+    text-align:center;
+    cursor:pointer;
+    z-index:10;
+    animation:latir 1.6s infinite;
+    user-select:none;
+}
+
+@keyframes latir{
+    0%{transform:translate(-50%,-50%) scale(1)}
+    50%{transform:translate(-50%,-50%) scale(1.12)}
+    100%{transform:translate(-50%,-50%) scale(1)}
+}
+
+/* MENSAJE LARGO */
+.mensaje-largo{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:85%;
+    max-height:75vh;
+    font-family:'Playfair Display', serif;
+    font-size:clamp(18px,2.2vw,26px);
+    line-height:1.7;
+    text-align:center;
+    padding:25px;
+    overflow-y:auto;
+    display:none;
+    z-index:5;
+    text-shadow:0 0 8px rgba(255,255,255,.4);
+}
+
+/* GIRASOLES */
+.girasol{
+    position:absolute;
+    font-size:70px;
+    opacity:0;
+    animation:crecer 2s ease-out forwards;
+    z-index:2;
+}
+
+@keyframes crecer{
+    from{transform:scale(0);opacity:0}
+    to{transform:scale(1);opacity:1}
+}
+
+/* CORAZONES */
+.corazon{
+    position:absolute;
+    opacity:.9;
+    animation:flotar linear infinite;
+    z-index:3;
+}
+
+@keyframes flotar{
+    0%{transform:translateY(110vh) scale(.8);opacity:0}
+    10%{opacity:1}
+    100%{transform:translateY(-10vh) scale(1.8);opacity:0}
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="estrellas"></canvas>
+
+<div class="mensaje" id="mensajeInicial">
+    Te Amo<br>Mi Niña Hermosa
+</div>
+
+<div id="btnInicio">
+    🤍<br>
+    Tocar para comenzar
+</div>
+
+<div class="mensaje-largo" id="mensajeLargo">
+    <div id="textoCarta"></div>
+</div>
+
+<!-- AUDIO -->
+<audio id="musica" preload="auto" loop>
+    <source src="Rafa Pérez - Si No Me Falla El Corazón (Video Oficial).mp3" type="audio/mpeg">
+</audio>
+
+<script>
+/* 🌌 ESTRELLAS */
+const canvas = document.getElementById("estrellas");
+const ctx = canvas.getContext("2d");
+
+function ajustar(){
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+}
+ajustar();
+addEventListener("resize", ajustar);
+
+const estrellas=[];
+for(let i=0;i<220;i++){
+    estrellas.push({
+        x:Math.random()*canvas.width,
+        y:Math.random()*canvas.height,
+        r:Math.random()*1.5+.5,
+        o:Math.random()
+    });
+}
+
+setInterval(()=>{
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle="white";
+    estrellas.forEach(e=>{
+        ctx.globalAlpha=e.o;
+        ctx.beginPath();
+        ctx.arc(e.x,e.y,e.r,0,Math.PI*2);
+        ctx.fill();
+    });
+},50);
+
+/* 🌻 ZONA LIBRE */
+function fueraDelCentro(x,y){
+    const cx=innerWidth/2;
+    const cy=innerHeight/2;
+    return Math.abs(x-cx)>250 || Math.abs(y-cy)>200;
+}
+
+/* 🌻 GIRASOLES */
+let girasolInterval=setInterval(()=>{
+    for(let i=0;i<4;i++){
+        let x,y;
+        do{
+            x=Math.random()*innerWidth;
+            y=Math.random()*innerHeight;
+        }while(!fueraDelCentro(x,y));
+
+        const g=document.createElement("div");
+        g.className="girasol";
+        g.textContent="🌻";
+        g.style.left=x+"px";
+        g.style.top=y+"px";
+        document.body.appendChild(g);
+    }
+},1500);
+
+/* 🤍 CORAZONES */
+setInterval(()=>{
+    const c=document.createElement("div");
+    c.className="corazon";
+    c.textContent="🤍";
+    c.style.left=Math.random()*100+"vw";
+    c.style.fontSize=(18+Math.random()*35)+"px";
+    c.style.animationDuration=(3+Math.random()*4)+"s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),8000);
+},60);
+
+/* ✍️ TEXTO CARTA */
+const textoCompleto = `
+<span style="font-family:'Dancing Script'; font-size:44px;">
+🤍MI NIÑA HERMOSA🤍
+</span><br><br>
+
+Este es un pequeño detalle que quiero tener contigo,  
+TE AMO, sí, TE AMO DE TODOS LOS NÚMEROS.  
+Eres la Mujer y el Amor de Mi Vida, de eso no hay duda  
+y estoy completamente seguro.<br><br>
+
+Quiero seguir a tu lado creciendo y mejorando como persona,  
+aprender y corregir nuevas cosas día tras día.  
+Eres la persona con la que me veo a futuro construyendo  
+y logrando grandes cosas tanto personales como en pareja.<br><br>
+
+Quiero vivir nuevas experiencias contigo,  
+tener muchos recuerdos y anécdotas juntos.  
+Eres la mujer que me regala alegrías y sonrisas diariamente  
+y no quiero que eso cambie.<br><br>
+
+Solo te quiero a ti.  
+Te elegiría nuevamente una y mil veces si tuviera la oportunidad.  
+A tu lado todo es mejor, somos un equipo,  
+eres mi compañera de aventuras.<br><br>
+
+Quiero seguir a tu lado superando las adversidades  
+que se nos presenten.  
+Estoy muy feliz de que seas tú  
+Mi Novia, Mi Mujer, El Amor de Mi vida, Mi Niña Hermosa.
+Mi Consentida, Aquella que Alegra mis Dias Siempre.<br><br>
+
+TE AMO, TE AMO, TE AMO, TE AMO, TE AMO, TE AMO, TE AMO, TE AMO,
+TE AMO, TE AMO, TE AMO, TE AMO, TE AMO, TE AMO, TE AMO, TE AMO, 
+TE AMO, TE AMO, TE AMO, TE AMO, TE AMO, TE AMO, 
+TE AMO DE TODOS LOS NUMEROS MI NIÑA HERMOSA. 🤍🤍🤍<br><br>
+`;
+
+const contenedorTexto=document.getElementById("textoCarta");
+let indice=0;
+
+function escribirCarta(){
+    if(indice<textoCompleto.length){
+        contenedorTexto.innerHTML=textoCompleto.slice(0,indice+1);
+        contenedorTexto.parentElement.scrollTop=contenedorTexto.parentElement.scrollHeight;
+        indice++;
+        setTimeout(escribirCarta,55);
+    }
+}
+
+/* 🎵 BOTÓN QUE DESBLOQUEA TODO (CELULAR) */
+const musica=document.getElementById("musica");
+const btnInicio=document.getElementById("btnInicio");
+
+btnInicio.addEventListener("click",()=>{
+    musica.volume=0.7;
+    musica.play();
+
+    btnInicio.style.display="none";
+
+    setTimeout(()=>{
+        document.getElementById("mensajeInicial").style.display="none";
+        document.getElementById("mensajeLargo").style.display="block";
+        clearInterval(girasolInterval);
+        document.querySelectorAll(".girasol").forEach(g=>g.remove());
+        escribirCarta();
+    },1500);
+});
+</script>
+
+</body>
+</html>
